@@ -10,7 +10,7 @@ const Index: React.FC = () => {
       <AnimatedBackground />
       <div className="relative z-10 flex flex-col h-screen">
         <Header />
-        <main className="flex-1 pt-24 pb-6">
+        <main className="flex-1 pt-16">
           <ChatInterface />
         </main>
       </div>

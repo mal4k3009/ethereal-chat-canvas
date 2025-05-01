@@ -3,7 +3,7 @@ import { toast } from "@/components/ui/use-toast";
 
 // This is the API key provided by the user
 const API_KEY = "AIzaSyAkcOeeAgrkyI_2bCJygHiWoifNAxDiSdk";
-const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent";
+const API_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent";
 
 export interface ChatMessage {
   id: string;
