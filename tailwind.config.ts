@@ -64,15 +64,15 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				chat: {
-					user: '#9b87f5',
+					user: '#4BCDC3',
 					bot: '#1A1F2C',
 					input: '#2C3E50'
 				},
 				gemini: {
 					dark: '#1A1F2C',
 					light: '#2C3E50',
-					accent: '#9b87f5',
-					secondary: '#7E69AB'
+					accent: '#4BCDC3',
+					secondary: '#39A99E'
 				}
 			},
 			borderRadius: {

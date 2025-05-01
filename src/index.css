@@ -14,7 +14,7 @@
     --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 252 80% 74%;
+    --primary: 170 80% 70%;
     --primary-foreground: 0 0% 98%;
 
     --secondary: 240 3.7% 15.9%;
@@ -23,7 +23,7 @@
     --muted: 240 3.7% 15.9%;
     --muted-foreground: 240 5% 64.9%;
 
-    --accent: 252 80% 74%;
+    --accent: 170 80% 70%;
     --accent-foreground: 0 0% 98%;
 
     --destructive: 0 62.8% 30.6%;
@@ -31,7 +31,7 @@
 
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
-    --ring: 252 80% 74%;
+    --ring: 170 80% 70%;
 
     --radius: 0.75rem;
   }
@@ -96,7 +96,8 @@
 .chat-container {
   position: relative;
   z-index: 10;
-  padding-top: 1rem;
+  padding-top: 5rem;
+  padding-bottom: 2rem;
 }
 
 /* Enhanced animation keyframes */
@@ -112,12 +113,12 @@
 /* Update the header styles for better spacing */
 header.glass-morphism {
   padding: 0.75rem 0;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 /* Add a subtle glow effect to input and buttons */
 .chat-input:focus {
-  box-shadow: 0 0 15px rgba(155, 135, 245, 0.4);
+  box-shadow: 0 0 15px rgba(75, 205, 195, 0.5);
 }
 
 button.bg-gemini-accent {
@@ -126,5 +127,28 @@ button.bg-gemini-accent {
 
 button.bg-gemini-accent:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(155, 135, 245, 0.5);
+  box-shadow: 0 4px 12px rgba(75, 205, 195, 0.5);
+}
+
+.loading-dot {
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.loading-dot:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.loading-dot:nth-child(3) {
+  animation-delay: 0.6s;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }

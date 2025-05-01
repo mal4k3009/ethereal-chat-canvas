@@ -27,18 +27,19 @@ const AnimatedBackground: React.FC = () => {
     
     containerRef.current.appendChild(renderer.domElement);
     
-    // Particles
+    // Create two separate particle systems
+    // Main particle system
     const particlesGeometry = new THREE.BufferGeometry();
-    const particlesCount = 3000; // Increased particle count
+    const particlesCount = 3500;
     
     const posArray = new Float32Array(particlesCount * 3);
     const colorArray = new Float32Array(particlesCount * 3);
     const scaleArray = new Float32Array(particlesCount);
     
-    // Create random positions, colors, and scales
+    // Create random positions, colors, and scales with variety
     for (let i = 0; i < particlesCount * 3; i += 3) {
       // Create a spherical distribution
-      const radius = 25 + Math.random() * 15;
+      const radius = 30 + Math.random() * 20;
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.random() * Math.PI;
       
@@ -46,14 +47,14 @@ const AnimatedBackground: React.FC = () => {
       posArray[i + 1] = radius * Math.sin(phi) * Math.sin(theta);
       posArray[i + 2] = radius * Math.cos(phi);
       
-      // Create gradient colors from purple to blue
-      colorArray[i] = 0.6 + Math.random() * 0.4; // R: Purple range
-      colorArray[i + 1] = 0.3 + Math.random() * 0.3; // G: Low
-      colorArray[i + 2] = 0.8 + Math.random() * 0.2; // B: Blue range
+      // Create teal to cyan gradient colors
+      colorArray[i] = 0.2 + Math.random() * 0.3; // R: low
+      colorArray[i + 1] = 0.7 + Math.random() * 0.3; // G: high
+      colorArray[i + 2] = 0.8 + Math.random() * 0.2; // B: high-medium
     }
     
     for (let i = 0; i < particlesCount; i++) {
-      scaleArray[i] = Math.random();
+      scaleArray[i] = Math.random() * 1.5;
     }
     
     particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
@@ -74,15 +75,59 @@ const AnimatedBackground: React.FC = () => {
     const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
     scene.add(particlesMesh);
     
+    // Secondary smaller particles
+    const smallParticlesGeometry = new THREE.BufferGeometry();
+    const smallParticlesCount = 2000;
+    const smallPosArray = new Float32Array(smallParticlesCount * 3);
+    
+    for (let i = 0; i < smallParticlesCount * 3; i += 3) {
+      // Create a wider distribution
+      smallPosArray[i] = (Math.random() - 0.5) * 100;
+      smallPosArray[i + 1] = (Math.random() - 0.5) * 100;
+      smallPosArray[i + 2] = (Math.random() - 0.5) * 100;
+    }
+    
+    smallParticlesGeometry.setAttribute('position', new THREE.BufferAttribute(smallPosArray, 3));
+    
+    const smallParticlesMaterial = new THREE.PointsMaterial({
+      size: 0.1,
+      color: 0x4BCDC3,
+      transparent: true,
+      opacity: 0.4,
+      blending: THREE.AdditiveBlending
+    });
+    
+    const smallParticlesMesh = new THREE.Points(smallParticlesGeometry, smallParticlesMaterial);
+    scene.add(smallParticlesMesh);
+    
     // Add a central glow
     const glowGeometry = new THREE.SphereGeometry(5, 32, 32);
     const glowMaterial = new THREE.MeshBasicMaterial({
-      color: 0x9b87f5,
+      color: 0x4BCDC3,
       transparent: true,
       opacity: 0.15
     });
     const glowMesh = new THREE.Mesh(glowGeometry, glowMaterial);
     scene.add(glowMesh);
+    
+    // Create ambient light objects
+    const createLightOrb = (x: number, y: number, z: number, size: number, color: number) => {
+      const orbGeometry = new THREE.SphereGeometry(size, 16, 16);
+      const orbMaterial = new THREE.MeshBasicMaterial({
+        color: color,
+        transparent: true,
+        opacity: 0.6
+      });
+      const orb = new THREE.Mesh(orbGeometry, orbMaterial);
+      orb.position.set(x, y, z);
+      scene.add(orb);
+      return orb;
+    };
+    
+    // Add a few light orbs
+    const orb1 = createLightOrb(15, 10, -10, 1.5, 0x4BCDC3);
+    const orb2 = createLightOrb(-20, -15, 5, 2, 0x39A99E);
+    const orb3 = createLightOrb(0, -20, 15, 1, 0x55E6DB);
     
     // Mouse movement effect
     let mouseX = 0;
@@ -111,9 +156,18 @@ const AnimatedBackground: React.FC = () => {
       requestAnimationFrame(animate);
       
       // More complex rotation
-      particlesMesh.rotation.x = Math.sin(time * 0.2) * 0.1;
-      particlesMesh.rotation.y = Math.cos(time * 0.3) * 0.1;
+      particlesMesh.rotation.x = Math.sin(time * 0.3) * 0.1;
+      particlesMesh.rotation.y = Math.cos(time * 0.2) * 0.1;
       particlesMesh.rotation.z += 0.001;
+      
+      smallParticlesMesh.rotation.x = Math.sin(time * 0.2) * 0.05;
+      smallParticlesMesh.rotation.y = Math.cos(time * 0.3) * 0.05;
+      smallParticlesMesh.rotation.z -= 0.0005;
+      
+      // Animated orbs
+      orb1.position.y = 10 + Math.sin(time * 1.5) * 3;
+      orb2.position.x = -20 + Math.cos(time * 0.8) * 5;
+      orb3.position.z = 15 + Math.sin(time * 1.2) * 4;
       
       // Wave pattern animation
       const positions = particlesGeometry.attributes.position.array;
@@ -125,9 +179,9 @@ const AnimatedBackground: React.FC = () => {
         const z = positions[i + 2];
         
         // Apply wave effect
-        const waveX = Math.sin(time * 2 + x * 0.1) * 0.2;
-        const waveY = Math.cos(time * 3 + y * 0.1) * 0.2;
-        const waveZ = Math.sin(time * 1.5 + z * 0.1) * 0.2;
+        const waveX = Math.sin(time * 2 + x * 0.1) * 0.3;
+        const waveY = Math.cos(time * 3 + y * 0.1) * 0.3;
+        const waveZ = Math.sin(time * 1.5 + z * 0.1) * 0.3;
         
         positions[i] = posArray[i] + waveX;
         positions[i + 1] = posArray[i + 1] + waveY;
@@ -137,11 +191,8 @@ const AnimatedBackground: React.FC = () => {
       particlesGeometry.attributes.position.needsUpdate = true;
       
       // Pulse the central glow
-      glowMesh.scale.set(
-        1 + Math.sin(time * 3) * 0.2,
-        1 + Math.sin(time * 3) * 0.2,
-        1 + Math.sin(time * 3) * 0.2
-      );
+      const pulseScale = 1 + Math.sin(time * 3) * 0.2;
+      glowMesh.scale.set(pulseScale, pulseScale, pulseScale);
       
       // Smooth camera movement based on mouse position
       camera.position.x += (mouseX - camera.position.x) * 0.03;
