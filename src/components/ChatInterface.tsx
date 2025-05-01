@@ -3,16 +3,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
 import { toast } from '@/components/ui/use-toast';
-
-// Define a type for our messages
-interface Message {
-  id: string;
-  text: string;
-  isUser: boolean;
-}
+import { sendChatMessage, ChatMessage as ChatMessageType } from '@/services/chatService';
 
 const ChatInterface: React.FC = () => {
-  const [messages, setMessages] = useState<Message[]>([
+  const [messages, setMessages] = useState<ChatMessageType[]>([
     {
       id: '1',
       text: "Hi there! I'm Gemini, your AI assistant. How can I help you today?",
@@ -31,7 +25,7 @@ const ChatInterface: React.FC = () => {
   };
 
   const handleSendMessage = async (text: string) => {
-    const newUserMessage: Message = {
+    const newUserMessage: ChatMessageType = {
       id: Date.now().toString(),
       text,
       isUser: true
@@ -40,31 +34,31 @@ const ChatInterface: React.FC = () => {
     setMessages(prev => [...prev, newUserMessage]);
     setIsLoading(true);
 
-    // Simulate AI response after delay
-    setTimeout(() => {
-      const responses = [
-        "That's a great question! Let me think about that...",
-        "I'm analyzing the information you provided...",
-        "Based on my knowledge, here's what I found...",
-        "That's interesting! Here's my perspective on it...",
-        "I can help with that. Here's what you should know..."
-      ];
-
-      const randomIndex = Math.floor(Math.random() * responses.length);
+    try {
+      // Use the chat service to get a response
+      const response = await sendChatMessage(text);
       
-      const newBotMessage: Message = {
+      const newBotMessage: ChatMessageType = {
         id: (Date.now() + 1).toString(),
-        text: responses[randomIndex],
+        text: response,
         isUser: false
       };
 
       setMessages(prev => [...prev, newBotMessage]);
+    } catch (error) {
+      console.error("Error getting response:", error);
+      toast({
+        title: "Error",
+        description: "Failed to get a response. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   return (
-    <div className="flex flex-col h-screen max-w-4xl mx-auto px-4 pt-24 pb-6">
+    <div className="flex flex-col h-screen max-w-4xl mx-auto px-4">
       <div className="flex-1 overflow-y-auto scrollbar-none mb-4 pr-2">
         <div className="space-y-6 pb-4">
           {messages.map((message, index) => (
