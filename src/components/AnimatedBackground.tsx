@@ -18,7 +18,7 @@ const AnimatedBackground: React.FC = () => {
       0.1,
       1000
     );
-    camera.position.z = 20;
+    camera.position.z = 30;
     
     // Renderer setup
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -29,14 +29,27 @@ const AnimatedBackground: React.FC = () => {
     
     // Particles
     const particlesGeometry = new THREE.BufferGeometry();
-    const particlesCount = 2000;
+    const particlesCount = 3000; // Increased particle count
     
     const posArray = new Float32Array(particlesCount * 3);
+    const colorArray = new Float32Array(particlesCount * 3);
     const scaleArray = new Float32Array(particlesCount);
     
-    // Create random positions and scales
-    for (let i = 0; i < particlesCount * 3; i++) {
-      posArray[i] = (Math.random() - 0.5) * 50;
+    // Create random positions, colors, and scales
+    for (let i = 0; i < particlesCount * 3; i += 3) {
+      // Create a spherical distribution
+      const radius = 25 + Math.random() * 15;
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.random() * Math.PI;
+      
+      posArray[i] = radius * Math.sin(phi) * Math.cos(theta);
+      posArray[i + 1] = radius * Math.sin(phi) * Math.sin(theta);
+      posArray[i + 2] = radius * Math.cos(phi);
+      
+      // Create gradient colors from purple to blue
+      colorArray[i] = 0.6 + Math.random() * 0.4; // R: Purple range
+      colorArray[i + 1] = 0.3 + Math.random() * 0.3; // G: Low
+      colorArray[i + 2] = 0.8 + Math.random() * 0.2; // B: Blue range
     }
     
     for (let i = 0; i < particlesCount; i++) {
@@ -45,19 +58,31 @@ const AnimatedBackground: React.FC = () => {
     
     particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
     particlesGeometry.setAttribute('scale', new THREE.BufferAttribute(scaleArray, 1));
+    particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 3));
     
-    // Material
+    // Material with vertex colors
     const particlesMaterial = new THREE.PointsMaterial({
       size: 0.2,
-      color: 0x9b87f5,
       transparent: true,
-      opacity: 0.8,
-      blending: THREE.AdditiveBlending
+      opacity: 0.7,
+      blending: THREE.AdditiveBlending,
+      vertexColors: true,
+      sizeAttenuation: true
     });
     
     // Points
     const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
     scene.add(particlesMesh);
+    
+    // Add a central glow
+    const glowGeometry = new THREE.SphereGeometry(5, 32, 32);
+    const glowMaterial = new THREE.MeshBasicMaterial({
+      color: 0x9b87f5,
+      transparent: true,
+      opacity: 0.15
+    });
+    const glowMesh = new THREE.Mesh(glowGeometry, glowMaterial);
+    scene.add(glowMesh);
     
     // Mouse movement effect
     let mouseX = 0;
@@ -80,15 +105,48 @@ const AnimatedBackground: React.FC = () => {
     window.addEventListener('resize', onWindowResize);
     
     // Animation loop
+    let time = 0;
     const animate = () => {
+      time += 0.001;
       requestAnimationFrame(animate);
       
-      particlesMesh.rotation.x += 0.001;
-      particlesMesh.rotation.y += 0.001;
+      // More complex rotation
+      particlesMesh.rotation.x = Math.sin(time * 0.2) * 0.1;
+      particlesMesh.rotation.y = Math.cos(time * 0.3) * 0.1;
+      particlesMesh.rotation.z += 0.001;
+      
+      // Wave pattern animation
+      const positions = particlesGeometry.attributes.position.array;
+      const scales = particlesGeometry.attributes.scale.array;
+      
+      for (let i = 0; i < particlesCount * 3; i += 3) {
+        const x = positions[i];
+        const y = positions[i + 1];
+        const z = positions[i + 2];
+        
+        // Apply wave effect
+        const waveX = Math.sin(time * 2 + x * 0.1) * 0.2;
+        const waveY = Math.cos(time * 3 + y * 0.1) * 0.2;
+        const waveZ = Math.sin(time * 1.5 + z * 0.1) * 0.2;
+        
+        positions[i] = posArray[i] + waveX;
+        positions[i + 1] = posArray[i + 1] + waveY;
+        positions[i + 2] = posArray[i + 2] + waveZ;
+      }
+      
+      particlesGeometry.attributes.position.needsUpdate = true;
+      
+      // Pulse the central glow
+      glowMesh.scale.set(
+        1 + Math.sin(time * 3) * 0.2,
+        1 + Math.sin(time * 3) * 0.2,
+        1 + Math.sin(time * 3) * 0.2
+      );
       
       // Smooth camera movement based on mouse position
-      camera.position.x += (mouseX - camera.position.x) * 0.05;
-      camera.position.y += (-mouseY - camera.position.y) * 0.05;
+      camera.position.x += (mouseX - camera.position.x) * 0.03;
+      camera.position.y += (-mouseY - camera.position.y) * 0.03;
+      camera.lookAt(scene.position);
       
       renderer.render(scene, camera);
     };
@@ -105,7 +163,7 @@ const AnimatedBackground: React.FC = () => {
     };
   }, []);
   
-  return <div ref={containerRef} id="canvas-container" />;
+  return <div ref={containerRef} id="canvas-container" className="animated-background" />;
 };
 
 export default AnimatedBackground;

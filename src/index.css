@@ -86,9 +86,45 @@
   width: 100vw;
   height: 100vh;
   z-index: -1;
+  overflow: hidden;
+}
+
+.animated-background {
+  animation: fadeIn 1.2s ease-out;
 }
 
 .chat-container {
   position: relative;
   z-index: 10;
+  padding-top: 1rem;
+}
+
+/* Enhanced animation keyframes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Update the header styles for better spacing */
+header.glass-morphism {
+  padding: 0.75rem 0;
+  margin-bottom: 1rem;
+}
+
+/* Add a subtle glow effect to input and buttons */
+.chat-input:focus {
+  box-shadow: 0 0 15px rgba(155, 135, 245, 0.4);
+}
+
+button.bg-gemini-accent {
+  transition: all 0.3s ease-in-out;
+}
+
+button.bg-gemini-accent:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(155, 135, 245, 0.5);
 }

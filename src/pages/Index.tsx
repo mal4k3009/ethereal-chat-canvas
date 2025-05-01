@@ -6,7 +6,7 @@ import Header from '@/components/Header';
 
 const Index: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gemini-dark to-gemini-light">
+    <div className="min-h-screen bg-gradient-to-b from-gemini-dark to-gemini-light overflow-hidden">
       <AnimatedBackground />
       <div className="relative z-10">
         <Header />
